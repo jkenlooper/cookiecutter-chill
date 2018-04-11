@@ -6,6 +6,8 @@
   "full_name": "Sir Llama",
   "email": "sir@llama.example.com",
   "project_short_description": "Website built with chill stuff and things",
-  "version": "0.1.0"
+  "version": "0.1.0",
+	"_copy_without_render": [
+		"templates"
+	]
 }
-

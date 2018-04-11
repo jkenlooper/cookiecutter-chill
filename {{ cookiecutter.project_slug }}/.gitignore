@@ -1,0 +1,13 @@
+*.DS_Store
+/.env
+/.htpasswd
+/db
+/dist/
+/frozen/
+/logs/
+/node_modules/
+/npm-debug.log
+/src/*/*.tmp.css
+/src/*/*.tmp.css.map
+/src/*/*.tmp.js
+/src/*/*.tmp.js.map
