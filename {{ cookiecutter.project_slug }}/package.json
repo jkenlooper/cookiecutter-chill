@@ -1,0 +1,10 @@
+{
+  "name": "{{ cookiecutter.project_slug }}",
+  "version": "{{ cookiecutter.version }}",
+  "description": "{{ cookiecutter.project_short_description }}",
+  "scripts": {
+    "dbdump": "echo '.dump' | sqlite3 db > db.dump.sql",
+    "dbcat": "cat db.dump.sql | sqlite3 db"
+  },
+  "author": "{{ cookiecutter.full_name }}"
+}

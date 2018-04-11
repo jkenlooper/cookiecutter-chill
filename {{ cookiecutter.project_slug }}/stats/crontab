@@ -1,0 +1,3 @@
+# m h	dom mon dow user	command
+26 *	* * * root perl /usr/src/awstats/awstats-7.7/tools/awstats_buildstaticpages.pl -awstatsprog=/usr/src/awstats/awstats-7.7/wwwroot/cgi-bin/awstats.pl -config={{ cookiecutter.site_domain }} -update -dir=/usr/run/stats/www/ >/proc/1/fd/1 2>/proc/1/fd/2
+# An empty line is required at the end of this file for a valid cron file.

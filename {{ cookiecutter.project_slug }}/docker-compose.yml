@@ -1,0 +1,70 @@
+version: '3.3'
+services:
+  web:
+    build:
+      context: ./
+      dockerfile: web.Dockerfile
+      args:
+        - conf=./web-nginx.production.conf
+    image: nginx:1.12.2-alpine
+    volumes:
+      - type: volume
+        source: root
+        target: /www/root
+        volume:
+          read_only: true
+      - type: volume
+        source: stats
+        target: /www/stats
+        volume:
+          read_only: true
+      - type: volume
+        source: logs
+        target: /www/logs
+    networks:
+      - {{ cookiecutter.project_slug }}
+    depends_on:
+      - stats
+      - api
+  stats:
+    build: ./stats/
+    networks:
+      - {{ cookiecutter.project_slug }}
+    volumes:
+      - type: volume
+        source: logs
+        target: /var/log/nginx/
+        volume:
+          read_only: true
+      - type: volume
+        source: stats
+        target: /usr/run/stats/www
+      - type: volume
+        source: statsdata
+        target: /usr/run/stats/data
+  chill:
+    image: chill
+    command: serve
+    env_file: .env
+    networks:
+      - {{ cookiecutter.project_slug }}
+    volumes:
+      - type: volume
+        source: root
+        target: /usr/run/root
+  api:
+    build:
+      context: ./
+      dockerfile: api.Dockerfile
+    networks:
+      - {{ cookiecutter.project_slug }}
+    env_file: .env
+    command: python src/api/app.py site.cfg
+networks:
+  {{ cookiecutter.project_slug }}:
+    driver: bridge
+volumes:
+  root:
+  logs:
+  stats:
+  statsdata:
