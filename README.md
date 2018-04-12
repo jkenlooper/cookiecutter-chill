@@ -1,9 +1,10 @@
-#Cookie Cutter for Chill Website
+# Cookiecutter for making a chill website
 
-... WIP ...
+Use the [python cookiecutter](https://github.com/audreyr/cookiecutter) to
+create a new starter website and follow the prompts.
 
-Use the python cookiecutter to create.
+```
+cookiecutter https://github.com/jkenlooper/cookiecutter-chill.git
+```
 
-# Notes of things to take care of afterwards
-
-Create .htpasswd for stats
+Then read the README.md that was created along with all the other files.

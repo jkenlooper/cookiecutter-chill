@@ -8,6 +8,19 @@ It is based off of the [chill cookiecutter](https://github.com/jkenlooper/cookie
 
 ## Developing
 
+TLDR; instructions
+```
+git init;
+git submodule add https://github.com/jkenlooper/chill.git chill;
+(cd chill; docker build -t chill .)
+touch .env .htpasswd;
+cat db.dump.sql | sqlite3 db;
+docker-compose build;
+docker-compose up --no-start;
+docker-compose start;
+curl http://localhost:8080
+```
+
 To get started you will need Docker.  
 [Download and install Docker](https://www.docker.com/community-edition#/download)
 on your machine if you haven't already.
@@ -24,7 +37,7 @@ configs, or create this file with `htpasswd` command.
 
 At the moment the chill docker image hasn't been published.  You can create one from the
 latest branch with a Dockerfile ([chill](https://github.com/jkenlooper/chill))
-and run `docker build`.
+and run `docker build -t chill .`.
 
 ### Building the site on your own machine
 
