@@ -12,6 +12,7 @@ TLDR; instructions
 ```
 git init;
 git submodule add https://github.com/jkenlooper/chill.git chill;
+git commit -m "Add chill submodule";
 (cd chill; docker build -t chill .)
 touch .env .htpasswd;
 cat db.dump.sql | sqlite3 db;

@@ -44,6 +44,9 @@ services:
         target: /usr/run/stats/data
   chill:
     image: chill
+    build:
+      context: ./
+      dockerfile: chill.Dockerfile
     command: serve
     env_file: .env
     networks:
