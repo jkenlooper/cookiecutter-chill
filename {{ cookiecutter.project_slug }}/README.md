@@ -58,3 +58,35 @@ machine.
 After building the docker images, run the `docker-compose up` command and the
 site should be available at [http://localhost:8080](http://localhost:8080).
 
+## Deployment
+
+This uses docker-machine to deploy to a server.  A staging or sandbox
+environment can be set up on your own machine with virtualBox.  
+
+### Configure the website to work with HTTPS for local development
+
+For the staging or sandbox environment use a self-signed SSL certificate.  For production, [certbot](https://certbot.eff.org/) is used to
+deploy [Let's Encrypt](https://letsencrypt.org/) certificates.
+
+Follow along with these articles for a more full explanation.
+
+- [How To Create a Self-Signed SSL Certificate for Nginx in Ubuntu 16.04](https://www.digitalocean.com/community/tutorials/how-to-create-a-self-signed-ssl-certificate-for-nginx-in-ubuntu-16-04)
+- [Docs on openssl req](https://www.openssl.org/docs/manmaster/man1/req.html)
+- [How to get HTTPS working on your local development environment in 5 minutes](https://medium.freecodecamp.org/how-to-get-https-working-on-your-local-development-environment-in-5-minutes-7af615770eec)
+
+To set it up for HTTPS on localhost using a root SSL certificate that is on your own machine:
+
+Generate a root SSL certificate
+`openssl genrsa -des3 -out web/rootCA.key 2048`
+
+Create the rootCA.pem and then import it to Keychain Access and mark it as always trusted.
+`openssl req -x509 -new -nodes -key web/rootCA.key -sha256 -days 1024 -out web/rootCA.pem`
+
+Create a certificate key for localhost and save it in web/server.key. Also create the certificate signing request and save it in web/server.crt.
+
+```
+openssl req -new -sha256 -nodes -out web/server.csr -newkey rsa:2048 -keyout web/server.key -config web/server.csr.cnf
+openssl x509 -req -in web/server.csr -CA web/rootCA.pem -CAkey web/rootCA.key -CAcreateserial -out web/server.crt -days 500 -sha256 -extfile web/v3.ext
+```
+
+Now the web/server.key and web/server.crt will be added to the web docker container when building.
