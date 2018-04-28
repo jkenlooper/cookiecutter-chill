@@ -4,8 +4,6 @@ services:
     build:
       args:
         - conf=./web-nginx.development.conf
-    ports:
-      - "8080:80"
     depends_on:
       - chill
   chill:

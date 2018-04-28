@@ -8,18 +8,30 @@ It is based off of the [chill cookiecutter](https://github.com/jkenlooper/cookie
 
 ## Developing
 
-TLDR; instructions
+You should have already setup your machine with a root SSL certificate and
+created the necessary files in the web directory. See the section below for the
+guide on this.
+
+Run this script if you know what you are doing and are skipping ahead.  
 ```
 git init;
+
+# Add chill image
 git submodule add https://github.com/jkenlooper/chill.git chill;
 git commit -m "Add chill submodule";
 (cd chill; docker build -t chill .)
+
+# Create db file and minimal other files
 touch .env .htpasswd;
 cat db.dump.sql | sqlite3 db;
+
+# Build and start
 docker-compose build;
 docker-compose up --no-start;
 docker-compose start;
-curl http://localhost:8080
+
+# Did it work?
+curl --cacert web/rootCA.pem https://localhost
 ```
 
 To get started you will need Docker.  
@@ -39,6 +51,50 @@ configs, or create this file with `htpasswd` command.
 At the moment the chill docker image hasn't been published.  You can create one from the
 latest branch with a Dockerfile ([chill](https://github.com/jkenlooper/chill))
 and run `docker build -t chill .`.
+
+### Configure the website to work with HTTPS for local development
+
+For the staging or sandbox environment use a self-signed SSL certificate.  For production, [certbot](https://certbot.eff.org/) is used to
+deploy [Let's Encrypt](https://letsencrypt.org/) certificates.
+
+Follow along with these articles for a more full explanation.
+
+- [How To Create a Self-Signed SSL Certificate for Nginx in Ubuntu 16.04](https://www.digitalocean.com/community/tutorials/how-to-create-a-self-signed-ssl-certificate-for-nginx-in-ubuntu-16-04)
+- [Docs on openssl req](https://www.openssl.org/docs/manmaster/man1/req.html)
+- [How to get HTTPS working on your local development environment in 5 minutes](https://medium.freecodecamp.org/how-to-get-https-working-on-your-local-development-environment-in-5-minutes-7af615770eec)
+
+To set it up for HTTPS on localhost using a root SSL certificate that is on your own machine:
+
+Generate a root SSL certificate
+`openssl genrsa -des3 -out web/rootCA.key 2048`
+
+Create the rootCA.pem and then import it to Keychain Access and mark it as always trusted.
+`openssl req -x509 -new -nodes -key web/rootCA.key -sha256 -days 1024 -out web/rootCA.pem`
+
+Create a certificate key for localhost and save it in web/server.key. Also
+create the certificate signing request and save it in web/server.crt.
+
+```
+openssl req -new -sha256 -nodes -newkey rsa:2048 \
+	-config web/server.csr.cnf \
+	-out web/server.csr \
+	-keyout web/server.key
+
+openssl x509 -req -CAcreateserial -days 500 -sha256 \
+	-in web/server.csr \
+	-CA web/rootCA.pem \
+	-CAkey web/rootCA.key \
+	-out web/server.crt \
+	-extfile web/v3.ext
+```
+
+Create a strong Diffie-Hellman group.
+
+```
+openssl dhparam -out web/dhparam.pem 2048
+```
+
+Now the web/server.key, web/server.crt, and web/dhparam.pem will be added to the web docker container when building.
 
 ### Building the site on your own machine
 
@@ -63,30 +119,3 @@ site should be available at [http://localhost:8080](http://localhost:8080).
 This uses docker-machine to deploy to a server.  A staging or sandbox
 environment can be set up on your own machine with virtualBox.  
 
-### Configure the website to work with HTTPS for local development
-
-For the staging or sandbox environment use a self-signed SSL certificate.  For production, [certbot](https://certbot.eff.org/) is used to
-deploy [Let's Encrypt](https://letsencrypt.org/) certificates.
-
-Follow along with these articles for a more full explanation.
-
-- [How To Create a Self-Signed SSL Certificate for Nginx in Ubuntu 16.04](https://www.digitalocean.com/community/tutorials/how-to-create-a-self-signed-ssl-certificate-for-nginx-in-ubuntu-16-04)
-- [Docs on openssl req](https://www.openssl.org/docs/manmaster/man1/req.html)
-- [How to get HTTPS working on your local development environment in 5 minutes](https://medium.freecodecamp.org/how-to-get-https-working-on-your-local-development-environment-in-5-minutes-7af615770eec)
-
-To set it up for HTTPS on localhost using a root SSL certificate that is on your own machine:
-
-Generate a root SSL certificate
-`openssl genrsa -des3 -out web/rootCA.key 2048`
-
-Create the rootCA.pem and then import it to Keychain Access and mark it as always trusted.
-`openssl req -x509 -new -nodes -key web/rootCA.key -sha256 -days 1024 -out web/rootCA.pem`
-
-Create a certificate key for localhost and save it in web/server.key. Also create the certificate signing request and save it in web/server.crt.
-
-```
-openssl req -new -sha256 -nodes -out web/server.csr -newkey rsa:2048 -keyout web/server.key -config web/server.csr.cnf
-openssl x509 -req -in web/server.csr -CA web/rootCA.pem -CAkey web/rootCA.key -CAcreateserial -out web/server.crt -days 500 -sha256 -extfile web/v3.ext
-```
-
-Now the web/server.key and web/server.crt will be added to the web docker container when building.
