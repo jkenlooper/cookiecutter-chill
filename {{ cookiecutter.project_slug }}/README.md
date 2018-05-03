@@ -94,7 +94,9 @@ Create a strong Diffie-Hellman group.
 openssl dhparam -out web/dhparam.pem 2048
 ```
 
-Now the web/server.key, web/server.crt, and web/dhparam.pem will be added to the web docker container when building.
+Now the web/server.key, web/server.crt, and web/dhparam.pem will be added to
+the web docker container when building. Note that the web/server.key and
+web/server.crt are not used in the production nginx conf.
 
 ### Building the site on your own machine
 
