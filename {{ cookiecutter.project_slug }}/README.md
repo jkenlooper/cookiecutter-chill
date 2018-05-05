@@ -118,6 +118,76 @@ site should be available at [http://localhost:8080](http://localhost:8080).
 
 ## Deployment
 
-This uses docker-machine to deploy to a server.  A staging or sandbox
-environment can be set up on your own machine with virtualBox.  
+This uses [docker-machine commands](https://docs.docker.com/machine/overview/)
+to deploy to a [DigitalOcean](https://www.digitalocean.com/) droplet.
+A staging or sandbox environment can be set up on your own machine with
+[VirtualBox](https://www.virtualbox.org/), but is not set up to use https.  
 
+### Staging with VirtualBox
+
+Test the production deployment on your own machine. Create a virtualbox
+host with docker. Note that the https won't work here unless you create a cert
+for the staging address.
+
+```
+docker-machine create --driver virtualbox \
+	 --virtualbox-disk-size 8000 \
+	 --virtualbox-memory 2048 \
+	 --virtualbox-no-share sandbox-{{ cookiecutter.project_slug }}
+```
+
+Connect your shell to the new machine.
+
+```
+eval "$(docker-machine env sandbox-{{ cookiecutter.project_slug }})"
+```
+
+Build it by passing in the production config
+
+```
+docker-compose -f docker-compose.yml -f docker-compose.production.yml build
+docker-compose -f docker-compose.yml -f docker-compose.production.yml up --no-start
+docker-compose -f docker-compose.yml -f docker-compose.production.yml start
+```
+
+### Deploy to DigitalOcean droplet
+
+You will need to set the PAT environment variable to your digital ocean
+personal access token.  
+
+Create the server with the name 'dm-{{ cookiecutter.project_slug }}-1' and
+connect your shell.  Using the 'dm-**-1' naming to hint that this is a
+docker-machine with the iteration or version of 1.  Update as necesary.
+
+```
+docker-machine create --driver digitalocean \
+	--digitalocean-access-token $PAT \
+	dm-{{ cookiecutter.project_slug }}-1
+eval "$(docker-machine env dm-{{ cookiecutter.project_slug }}-1)"
+```
+
+Build the services.
+
+```
+docker-compose -f docker-compose.yml -f docker-compose.production.yml build
+```
+
+Note that the certbot container will be renewing the cert every month via cron,
+but the registration part still needs to be done.  Set this up now by executing
+the `certbot certonly` command in the certbot container.
+
+```
+docker-compose -f docker-compose.yml -f docker-compose.production.yml \
+  run --rm certbot \
+  certbot certonly \
+  --webroot --webroot-path /www/root \
+  --test-cert \
+  --domain {{ cookiecutter.site_domain }}
+```
+
+Now that the letsencrypt certs have been made, all the services can be started.
+
+```
+docker-compose -f docker-compose.yml -f docker-compose.production.yml up --no-start
+docker-compose -f docker-compose.yml -f docker-compose.production.yml start
+```

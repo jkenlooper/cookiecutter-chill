@@ -1,9 +1,5 @@
 FROM nginx:1.12.2-alpine
 
-# Support for SSL
-# TODO: not necessary for this container?
-#RUN apk update && apk add openssl
-
 ARG conf
 
 # Replace the default.conf
