@@ -181,7 +181,6 @@ docker-compose -f docker-compose.yml -f docker-compose.production.yml \
   run --rm certbot \
   certbot certonly \
   --webroot --webroot-path /www/root \
-  --test-cert \
   --domain {{ cookiecutter.site_domain }}
 ```
 
