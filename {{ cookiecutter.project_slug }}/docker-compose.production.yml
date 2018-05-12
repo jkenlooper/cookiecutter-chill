@@ -7,6 +7,11 @@ services:
         target: /www/frozen
         volume:
           read_only: true
+      - type: volume
+        source: certbot_etc_letsencrypt
+        target: /etc/letsencrypt
+        volume:
+          read_only: true
     depends_on:
       - chill
   chill:

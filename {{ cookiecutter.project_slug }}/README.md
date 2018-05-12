@@ -164,7 +164,6 @@ docker-machine create --driver digitalocean \
 eval "$(docker-machine env dm-{{ cookiecutter.project_slug }}-1)"
 ```
 
-Build the services.
 
 ```
 docker-compose -f docker-compose.yml -f docker-compose.production.yml build
@@ -175,6 +174,10 @@ but the registration part still needs to be done.  Set this up now by executing
 the `certbot certonly` command in the certbot container.
 
 ```
+docker-compose -f docker-compose.yml -f docker-compose.production.yml up -d web
+```
+
+```
 docker-compose -f docker-compose.yml -f docker-compose.production.yml \
   run --rm certbot \
   certbot certonly \
@@ -182,8 +185,10 @@ docker-compose -f docker-compose.yml -f docker-compose.production.yml \
   --domain {{ cookiecutter.site_domain }}
 ```
 
-Now that the letsencrypt certs have been made, all the services can be started.
+Now that the letsencrypt certs have been made, the nginx conf can be updated to
+use them.  Uncomment the ssl certs in the nginx conf and build again.
 
 ```
+docker-compose -f docker-compose.yml -f docker-compose.production.yml build
 docker-compose -f docker-compose.yml -f docker-compose.production.yml up -d
 ```
