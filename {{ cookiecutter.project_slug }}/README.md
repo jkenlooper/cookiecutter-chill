@@ -27,8 +27,7 @@ cat db.dump.sql | sqlite3 db;
 
 # Build and start
 docker-compose build;
-docker-compose up --no-start;
-docker-compose start;
+docker-compose up -d;
 
 # Did it work?
 curl --cacert web/rootCA.pem https://localhost
@@ -39,7 +38,7 @@ To get started you will need Docker.
 on your machine if you haven't already.
 
 In the top level directory (where this README is) you will need to create
-a `.env` file to store secret stuff like api keys and other environment
+a `.env` file to store secret stuff like API keys and other environment
 variables.  This file should not be committed to source control. See the 
 [Docker documentation for env files](https://docs.docker.com/compose/env-file/)
 for more information. If you have no need for it, just create an empty file.
@@ -121,12 +120,12 @@ site should be available at [http://localhost:8080](http://localhost:8080).
 This uses [docker-machine commands](https://docs.docker.com/machine/overview/)
 to deploy to a [DigitalOcean](https://www.digitalocean.com/) droplet.
 A staging or sandbox environment can be set up on your own machine with
-[VirtualBox](https://www.virtualbox.org/), but is not set up to use https.  
+[VirtualBox](https://www.virtualbox.org/), but is not set up to use HTTPS.  
 
 ### Staging with VirtualBox
 
-Test the production deployment on your own machine. Create a virtualbox
-host with docker. Note that the https won't work here unless you create a cert
+Test the production deployment on your own machine. Create a VirtualBox
+host with docker. Note that the HTTPS won't work here unless you create a cert
 for the staging address.
 
 ```
@@ -146,8 +145,7 @@ Build it by passing in the production config
 
 ```
 docker-compose -f docker-compose.yml -f docker-compose.production.yml build
-docker-compose -f docker-compose.yml -f docker-compose.production.yml up --no-start
-docker-compose -f docker-compose.yml -f docker-compose.production.yml start
+docker-compose -f docker-compose.yml -f docker-compose.production.yml up -d
 ```
 
 ### Deploy to DigitalOcean droplet
@@ -157,7 +155,7 @@ personal access token.
 
 Create the server with the name 'dm-{{ cookiecutter.project_slug }}-1' and
 connect your shell.  Using the 'dm-**-1' naming to hint that this is a
-docker-machine with the iteration or version of 1.  Update as necesary.
+docker-machine with the iteration or version of 1.  Update as necessary.
 
 ```
 docker-machine create --driver digitalocean \
@@ -187,6 +185,5 @@ docker-compose -f docker-compose.yml -f docker-compose.production.yml \
 Now that the letsencrypt certs have been made, all the services can be started.
 
 ```
-docker-compose -f docker-compose.yml -f docker-compose.production.yml up --no-start
-docker-compose -f docker-compose.yml -f docker-compose.production.yml start
+docker-compose -f docker-compose.yml -f docker-compose.production.yml up -d
 ```
