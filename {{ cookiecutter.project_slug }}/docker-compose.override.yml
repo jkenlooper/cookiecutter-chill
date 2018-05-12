@@ -3,7 +3,7 @@ services:
   web:
     build:
       args:
-        - conf=./web-nginx.development.conf
+        - conf=./web/web-nginx.development.conf
     depends_on:
       - chill
   chill:
