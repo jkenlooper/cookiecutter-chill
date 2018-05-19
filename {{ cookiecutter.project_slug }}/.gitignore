@@ -11,3 +11,12 @@
 /src/*/*.tmp.css.map
 /src/*/*.tmp.js
 /src/*/*.tmp.js.map
+
+/web/dhparam.pem
+/web/rootCA.key
+/web/rootCA.pem
+/web/rootCA.srl
+/web/server.crt
+/web/server.csr
+/web/server.key
+

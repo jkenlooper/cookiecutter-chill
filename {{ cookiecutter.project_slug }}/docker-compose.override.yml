@@ -3,18 +3,41 @@ services:
   web:
     build:
       args:
-        - conf=./web-nginx.development.conf
-    ports:
-      - "8080:80"
+        - conf=./web/web-nginx.development.conf
     depends_on:
       - chill
   chill:
     command: run
     volumes:
-      - ./:/usr/run/
-        # TODO:
-        #- type: bind
-        #- source:
+      # /usr/run/root is a volume and is shared with web (nginx)
+
+      # bind to allow ease of adding documents and queries without rebuilding
+      - type: bind
+        source: ./documents
+        target: /usr/run/documents
+        read_only: true
+      - type: bind
+        source: ./queries
+        target: /usr/run/queries
+        read_only: true
+
+      # media files are compiled from another container
+      - type: volume
+        source: media
+        target: /usr/run/media
+
+      # dist files are compiled from another container
+      - type: volume
+        source: dist
+        target: /usr/run/dist
+
+      # SQLite database can be edited via local gui apps (use with care)
+      - type: bind
+        source: ./db
+        target: /usr/run/db
+      - type: bind
+        source: ./db.dump.sql
+        target: /usr/run/db.dump.sql
   api:
     volumes:
       - type: bind
@@ -28,3 +51,7 @@ services:
       - type: bind
         source: ./api/src
         target: /code/src
+
+volumes:
+  dist:
+  media:

@@ -12,9 +12,14 @@ FROM chill as chill
 
 #COPY --from=media /usr/media/ /usr/run/media/
 
+# TODO: copy compiled dist to /usr/run/dist/
+
 COPY . /usr/run/
 WORKDIR /usr/run/
 
+# Remove and recreate the db from the db.dump.sql.  When freezing the site the
+# db from the context shouldn't be used.  The db.dump.sql is the single source
+# of truth here.
 RUN rm -f db && cat db.dump.sql | sqlite3 db
 
 ENTRYPOINT ["chill"]
