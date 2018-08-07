@@ -1,3 +1,3 @@
 # m h	dom mon dow user	command
-0 3	13 * * root certbot renew --webroot --webroot-path /www/root --preferred-challenges webroot --non-interactive --domain {{ cookiecutter.site_domain }} >/proc/1/fd/1 2>/proc/1/fd/2
+0 3	13 * * root certbot renew >/proc/1/fd/1 2>/proc/1/fd/2
 # An empty line is required at the end of this file for a valid cron file.
